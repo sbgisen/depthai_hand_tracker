@@ -64,4 +64,3 @@ echo Model: $model_xml $model_blob
 echo Shaves $nb_shaves
 
 /opt/intel/openvino_2021/deployment_tools/inference_engine/lib/intel64/myriad_compile -m $model_xml -ip u8 -VPU_NUMBER_OF_SHAVES $nb_shaves -VPU_NUMBER_OF_CMX_SLICES $nb_shaves -o $model_blob
-

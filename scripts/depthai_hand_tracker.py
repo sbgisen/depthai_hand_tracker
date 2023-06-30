@@ -8,8 +8,8 @@ from geometry_msgs.msg import Point
 from sensor_msgs.msg import Image
 from std_msgs.msg import String
 
-from HandTrackerEdge import HandTracker
-from HandTrackerRenderer import HandTrackerRenderer
+from depthai_hand_tracker.HandTrackerEdge import HandTracker
+from depthai_hand_tracker.HandTrackerRenderer import HandTrackerRenderer
 
 
 def gesture() -> None:
@@ -42,8 +42,6 @@ def gesture() -> None:
             image_pub.publish(CvBridge().cv2_to_imgmsg(frame, "bgr8"))
         if len(hands) > 0:
             gesture_sign = hands[0].gesture
-            rospy.loginfo(gesture_sign)
-            rospy.loginfo(hands[0].xyz[2])
             palm_point = Point(hands[0].xyz[0], hands[0].xyz[1], hands[0].xyz[2])
             gesture_sign_pub.publish(gesture_sign)
             palm_point_pub.publish(palm_point)

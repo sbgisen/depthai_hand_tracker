@@ -42,6 +42,3 @@ Then, from the container shell, `convert_model.sh` converts the ONNX patched mod
 ```
 ./convert_model.sh  # Add `-s #` if you want to specify a number of shaves other than 1
 ```
-
-
-
