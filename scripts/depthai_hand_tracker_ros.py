@@ -25,8 +25,8 @@ def gesture() -> None:
         tracker=tracker,
     )
 
-    gesture_sign_pub = rospy.Publisher('gesture', String, queue_size=10)
-    image_pub = rospy.Publisher('detected_image', Image, queue_size=10)
+    gesture_sign_pub = rospy.Publisher('hand_gesture', String, queue_size=10)
+    image_pub = rospy.Publisher('hand_detected_image', Image, queue_size=10)
     palm_point_pub = rospy.Publisher('palm_point', Point, queue_size=10)
     rospy.init_node('hand_tracking', anonymous=True)
     rate = rospy.Rate(10)  # 10hz

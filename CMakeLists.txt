@@ -7,7 +7,7 @@ catkin_python_setup()
 
 catkin_package(CATKIN_DEPENDS rospy)
 
-install(PROGRAMS scripts/depthai_hand_tracker.py
+install(PROGRAMS scripts/depthai_hand_tracker_ros.py
         DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 # add_custom_target( ${PROJECT_NAME}_install_python_package ALL COMMAND python

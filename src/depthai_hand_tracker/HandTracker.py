@@ -7,9 +7,9 @@ from pathlib import Path
 
 import cv2
 import depthai as dai
+import mediapipe_utils as mpu
 import numpy as np
 
-import depthai_hand_tracker.mediapipe_utils as mpu
 from depthai_hand_tracker.FPS import FPS
 from depthai_hand_tracker.FPS import now
 
