@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+  <node pkg="depthai_hand_tracker" name="depthai_hand_tracker" type="depthai_hand_tracker_ros.py" output="screen">
+  </node>
+</launch>
