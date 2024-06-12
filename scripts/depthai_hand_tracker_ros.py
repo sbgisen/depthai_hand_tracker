@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 # -*- encoding: utf-8 -*-
 
-
-import rospy
+import rclpy
 from cv_bridge import CvBridge
-from geometry_msgs.msg import Point
+# from geometry_msgs.msg import Point
+from rclpy.node import Node
 from sensor_msgs.msg import Image
 from std_msgs.msg import String
 
@@ -12,46 +12,63 @@ from depthai_hand_tracker.HandTrackerEdge import HandTracker
 from depthai_hand_tracker.HandTrackerRenderer import HandTrackerRenderer
 
 
-def gesture() -> None:
+class HandTrackingNode(Node):
+    def __init__(self) -> None:
+        super().__init__('hand_tracking')
 
-    tracker = HandTracker(
-        use_gesture=True,
-        xyz=True,
-        stats=True,
-        # **tracker_args
-    )
+        self.tracker = HandTracker(
+            use_gesture=True,
+            xyz=False,
+            stats=True,
+            # **tracker_args
+        )
 
-    renderer = HandTrackerRenderer(
-        tracker=tracker,
-    )
+        self.renderer = HandTrackerRenderer(
+            tracker=self.tracker,
+        )
 
-    gesture_sign_pub = rospy.Publisher('hand_gesture', String, queue_size=10)
-    image_pub = rospy.Publisher('hand_detected_image', Image, queue_size=10)
-    palm_point_pub = rospy.Publisher('palm_point', Point, queue_size=10)
-    rospy.init_node('hand_tracking', anonymous=True)
-    rate = rospy.Rate(10)  # 10hz
-    while not rospy.is_shutdown():
-        # Run hand tracker on next frame
-        # 'bag' contains some information related to the frame
-        # and not related to a particular hand like body keypoints in Body Pre Focusing mode
-        # Currently 'bag' contains meaningful information only when Body Pre Focusing is used
-        # Draw hands
-        frame, hands, bag = tracker.next_frame()
-        if frame is not None:
-            frame = renderer.draw(frame, hands, bag)
-            image_pub.publish(CvBridge().cv2_to_imgmsg(frame, "bgr8"))
-        if len(hands) > 0:
-            gesture_sign = hands[0].gesture
-            palm_point = Point(hands[0].xyz[0], hands[0].xyz[1], hands[0].xyz[2])
-            gesture_sign_pub.publish(gesture_sign)
-            palm_point_pub.publish(palm_point)
-        rate.sleep()
-    renderer.exit()
-    tracker.exit()
+        self.gesture_sign_pub = self.create_publisher(String, 'hand_gesture', 10)
+        self.image_pub = self.create_publisher(Image, 'hand_detected_image', 10)
+        # self.palm_point_pub = self.create_publisher(Point, 'palm_point', 10)
+
+        self.timer = self.create_timer(0.1, self.timer_callback)  # 10hz
+        self.bridge = CvBridge()
+
+    def timer_callback(self) -> None:
+        try:
+            frame, hands, bag = self.tracker.next_frame()
+            if frame is not None:
+                frame = self.renderer.draw(frame, hands, bag)
+                self.image_pub.publish(self.bridge.cv2_to_imgmsg(frame, "bgr8"))
+            if len(hands) > 0:
+                gesture_sign = hands[0].gesture
+                self.get_logger().info(str(gesture_sign))
+                # palm_point = Point(x=hands[0].xyz[0], y=hands[0].xyz[1], z=hands[0].xyz[2])
+                msg = String()
+                msg.data = str(gesture_sign)
+                self.gesture_sign_pub.publish(msg)
+                # self.palm_point_pub.publish(palm_point)
+        except RuntimeError as e:
+            self.get_logger().error(f"RuntimeError: {str(e)}")
+
+    def destroy(self) -> None:
+        self.renderer.exit()
+        self.tracker.exit()
+        super().destroy()
+
+
+def main(args=None) -> None:
+    rclpy.init(args=args)
+    node = HandTrackingNode()
+
+    try:
+        rclpy.spin(node)
+    except KeyboardInterrupt:
+        pass
+
+    node.destroy()
+    rclpy.shutdown()
 
 
 if __name__ == '__main__':
-    try:
-        gesture()
-    except rospy.ROSInterruptException:
-        pass
+    main()
