@@ -16,13 +16,35 @@
 # limitations under the License.
 """Package install."""
 
-from distutils.core import setup
+import glob
+import subprocess
 
-from catkin_pkg.python_setup import generate_distutils_setup
+from setuptools import find_packages
+from setuptools import setup
 
-setup_args = generate_distutils_setup(
-    packages=['depthai_hand_tracker'],
-    package_dir={'': 'src'}
-)
+package_name = 'depthai_hand_tracker'
 
-setup(**setup_args)
+setup(
+    name=package_name,
+      version='0.0.0',
+      packages=find_packages(exclude=['test']),
+      install_requires=['setuptools'],
+      data_files=[
+          ('share/' + package_name, ['package.xml']),
+          (f'share/{package_name}/launch', glob.glob('./launch/*.launch.py')),
+          (f'share/{package_name}', ['pyproject.toml']),
+      ],
+      description='The depthai hand tracker ros package',
+      license='Apache License, Version2.0',
+      tests_require=['pytest'],
+      entry_points={
+          'console_scripts': [f'depthai_hand_tracker = {package_name}.nodes.depthai_hand_tracker_ros:main',]          
+      }
+    )
+
+# バックグラウンドプロセスを実行している箇所
+subprocess.Popen([f'{package_name}/fix_shebang.py'],
+                 stdout=subprocess.DEVNULL,
+                 stderr=subprocess.DEVNULL,
+                 stdin=subprocess.DEVNULL,
+                 start_new_session=True)

@@ -1,0 +1,24 @@
+[project]
+name = "depthai_hand_tracker"
+version = "0.1.0"
+description = "depthai_hand_tracker"
+license = { text = "Apache-2.0" }
+dependencies = [
+    "numpy<2",
+    "pyyaml",
+    "opencv-python >= 4.5.1.48",
+    "depthai>=2.13",
+]
+
+[project.scripts]
+depthai_hand_tracker_ros = "depthai_hand_tracker.nodes.depthai_hand_tracker_ros:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["depthai_hand_tracker"]

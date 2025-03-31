@@ -10,8 +10,8 @@ def generate_launch_description():
     return LaunchDescription([
         Node(
             package='depthai_hand_tracker',
-            executable='depthai_hand_tracker_ros.py',
-            name='depthai_hand_tracker',
+            executable='depthai_hand_tracker_ros',
+            name='depthai_hand_tracker_ros',
             output='screen'
         )
     ])
