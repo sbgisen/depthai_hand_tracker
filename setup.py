@@ -17,10 +17,31 @@
 """Package install."""
 
 import glob
+import os
 import subprocess
 
 from setuptools import find_packages
 from setuptools import setup
+
+def install_udev_rules():
+    """Check if the udev rule file exists, and if not, create it."""
+    udev_rule_path = "/etc/udev/rules.d/80-movidius.rules"
+    
+    if not os.path.exists(udev_rule_path):
+        subprocess.run(
+            [
+                "sudo", "bash", "-c",
+                'echo \'SUBSYSTEM=="usb", ATTRS{idVendor}=="03e7", MODE="0666"\' > ' + udev_rule_path
+            ],
+            check=True
+        )
+        subprocess.run(["sudo", "udevadm", "control", "--reload-rules"], check=True)
+        subprocess.run(["sudo", "udevadm", "trigger"], check=True)
+
+
+# Call the function before running setup()
+install_udev_rules()
+
 
 package_name = 'depthai_hand_tracker'
 
